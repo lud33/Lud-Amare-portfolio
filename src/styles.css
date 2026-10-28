@@ -531,7 +531,8 @@ h3 {
 .timeline-item ul { padding-left: 1rem; margin: .4rem 0 0; }
 .timeline-item li { margin: .25rem 0; font: 400 .88rem/1.6 var(--sans); color: var(--muted); }
 
-/* ── Skills ── */
+
+
 .skills-list {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
@@ -592,7 +593,7 @@ h3 {
 .contact {
   background: var(--navy);
   border-top: none !important;
-  padding: clamp(5rem, 12vw, 9rem) clamp(1.5rem, 5vw, 4rem);
+  padding: clamp(2.5rem, 5vw, 4rem) clamp(1.5rem, 5vw, 4rem);
   text-align: center;
   position: relative;
   overflow: hidden;
@@ -608,17 +609,17 @@ h3 {
 }
 .contact-inner { position: relative; z-index: 1; }
 .contact h2 {
-  font: 300 clamp(2.8rem, 7vw, 5.5rem)/1 var(--serif-display);
+  font: 300 clamp(1.8rem, 4vw, 3rem)/1.1 var(--serif-display);
   color: #f0ece4;
-  margin-bottom: 1.25rem;
+  margin-bottom: .75rem;
   letter-spacing: -.02em;
 }
 .contact h2 em { font-style: italic; color: var(--peach); }
 .contact p {
   max-width: 480px;
   margin-inline: auto;
-  margin-bottom: 2.5rem;
-  font: 400 1rem/1.7 var(--sans);
+  margin-bottom: 1.5rem;
+  font: 400 .9rem/1.6 var(--sans);
   color: rgba(240,236,228,.55);
 }
 .email-link {

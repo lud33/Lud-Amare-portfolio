@@ -403,8 +403,8 @@ export default function App() {
 
       <header className="site-header">
         <div className="header-inner">
-          <a className="wordmark" href="#home" aria-label="Lud Amare Endale, home">
-            Lud Amare <span>Endale</span>
+          <a className="wordmark" href="#home" aria-label="Lud Amare, home">
+            Lud Amare
           </a>
           <nav aria-label="Main navigation">
             <a href="#work">Work</a>
@@ -430,7 +430,6 @@ export default function App() {
           <div className="hero-bg-shape hero-bg-shape-1" aria-hidden="true" />
           <div className="hero-bg-shape hero-bg-shape-2" aria-hidden="true" />
           <p className="hero-eyebrow">
-            <span className="star">✦</span>
             Full-stack software engineer · Addis Ababa, Ethiopia
           </p>
           <h1 id="hero-title">
@@ -443,7 +442,6 @@ export default function App() {
             turning requirements into products people can actually use.
           </p>
           <div className="hero-meta">
-            <span><span className="dot" />Available for work</span>
             <span>Addis Ababa, Ethiopia</span>
             <span>BSc Computer Science · AAU</span>
           </div>
@@ -553,7 +551,7 @@ export default function App() {
         </section>
       </main>
 
-      <footer>Designed and built by Lud Amare Endale · Addis Ababa, Ethiopia</footer>
+      <footer>Designed and built by Lud Amare · Addis Ababa, Ethiopia</footer>
 
       {lightbox && (
         <Lightbox
