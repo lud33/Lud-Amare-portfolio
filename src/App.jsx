@@ -68,16 +68,16 @@ const projectDetails = [
   {
     id: "esl",
     title: "Ethiopian Sign Language E-Learning",
-    summary: "Interactive sign language courses with progress tracking.",
+    summary: "A React.js frontend for sign language courses and learner progress.",
     description:
-      "Backend developer on a learning platform built to make Ethiopian Sign Language education structured and accessible.",
+      "Frontend developer on the ETHSL learning platform, building an interactive React.js experience that makes Ethiopian Sign Language education structured and accessible.",
     features: [
-      "Built the core backend in Python Django, including secure authentication and course and level unlocking logic.",
-      "Implemented interactive quizzes and learner progress tracking.",
-      "Worked on frontend integration, testing, debugging and backend performance optimization.",
+      "Built frontend experiences for browsing courses and learning levels.",
+      "Created interactive quiz and learner progress interfaces.",
+      "Connected and refined the user-facing learning experience with a focus on usability and accessibility.",
     ],
-    tags: ["Python", "Django", "REST API"],
-    role: "Backend developer",
+    tags: ["React.js", "JavaScript", "Frontend"],
+    role: "Frontend developer",
   },
   {
     id: "movie",
