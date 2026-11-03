@@ -70,14 +70,14 @@ const projectDetails = [
     title: "Ethiopian Sign Language E-Learning",
     summary: "A React.js frontend for sign language courses and learner progress.",
     description:
-      "Frontend developer on the ETHSL learning platform, building an interactive React.js experience that makes Ethiopian Sign Language education structured and accessible.",
+      "Contributed to the ETHSL learning platform as a frontend developer, building an interactive React.js experience and providing some backend support. The platform makes Ethiopian Sign Language education structured and accessible.",
     features: [
       "Built frontend experiences for browsing courses and learning levels.",
       "Created interactive quiz and learner progress interfaces.",
       "Connected and refined the user-facing learning experience with a focus on usability and accessibility.",
     ],
-    tags: ["React.js", "JavaScript", "Frontend"],
-    role: "Frontend developer",
+    tags: ["React.js", "JavaScript", "Frontend", "Backend support"],
+    role: "Frontend developer with backend support",
   },
   {
     id: "movie",
