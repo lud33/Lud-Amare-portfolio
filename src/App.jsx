@@ -348,7 +348,16 @@ export default function App() {
   const [openProject, setOpenProject] = useState("stricker");
   const [lightbox, setLightbox] = useState(null);
   const [progress, setProgress] = useState(0);
+  const [fontsReady, setFontsReady] = useState(false);
   const lastFocused = useRef(null);
+
+  useEffect(() => {
+    if (!document.fonts) {
+      setFontsReady(true);
+      return;
+    }
+    document.fonts.ready.then(() => setFontsReady(true));
+  }, []);
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
@@ -426,7 +435,7 @@ export default function App() {
 
       <main>
         {/* ── Hero ── */}
-        <section className="hero" id="home" aria-labelledby="hero-title">
+        <section className={`hero${fontsReady ? " fonts-ready" : ""}`} id="home" aria-labelledby="hero-title">
           <div className="hero-bg-shape hero-bg-shape-1" aria-hidden="true" />
           <div className="hero-bg-shape hero-bg-shape-2" aria-hidden="true" />
           <p className="hero-eyebrow">
