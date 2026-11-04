@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import streaker1 from "./streaker1.png";
 import streaker2 from "./streaker2.png";
 import streaker3 from "./streaker3.png";
@@ -12,6 +12,9 @@ import movies2 from "./movies2.png";
 import ethsl1 from "./ethsl1.png";
 import ethsl2 from "./ethsl2.png";
 import ethsl3 from "./ethsl3.png";
+import CircularCarousel from "./CircularCarousel.jsx";
+import WakeSlider from "./WakeSlider.jsx";
+import DotField from "./DotField.jsx";
 
 const projects = {
   stricker: [
@@ -42,11 +45,18 @@ const projectDetails = [
     id: "stricker",
     title: "Streaker",
     summary: "A habit and goal tracker for personal accountability.",
-    description:
-      "A personal accountability app for building habits, setting goals and seeing progress over time. Its React + TypeScript frontend connects to a Laravel 12 API for authentication, habits, completions and goals.",
-    features: [
-      "Register and log in; create habits and mark them complete with date and time.",
-      "Set goals, track progress, view analytics and achievements, and manage account settings.",
+    intro: "Build habits. Keep momentum.",
+    detail:
+      "A focused place to create daily habits, set goals and track progress over time, built with a React and TypeScript frontend and a Laravel 12 API.",
+    featureCards: [
+      {
+        title: "Authentication & tracking",
+        description: "Sign in, create habits, and record completions with the date and time.",
+      },
+      {
+        title: "Analytics & goals",
+        description: "Set goals, follow progress, review analytics and achievements, and manage account settings.",
+      },
     ],
     tags: ["React", "TypeScript", "Laravel 12", "REST API"],
     role: "Full-stack developer",
@@ -55,12 +65,22 @@ const projectDetails = [
     id: "pic",
     title: "Partner In Crime",
     summary: "A social meetup app for finding people to do things with.",
+    intro: "Find your people. Make a plan.",
     description:
-      "A place to discover and organize meetups, connect with other attendees and coordinate plans in real time.",
-    features: [
-      "Discover feed of event listings; create a PIC with title, date, time, location, category and description.",
-      "Request to join someone else's event, then chat with matched users to coordinate details.",
-      "Keep track of your own PICs, notifications and profile.",
+      "Partner In Crime helps people find company for events and activities. Users can discover meetups, create their own, request to join, and chat with matched attendees to coordinate plans.",
+    featureCards: [
+      {
+        title: "Discover & create",
+        description: "Browse event listings or create a meetup with its time, place, category and details.",
+      },
+      {
+        title: "Join & connect",
+        description: "Request to join an event and chat with matched attendees to coordinate plans.",
+      },
+      {
+        title: "Your activity",
+        description: "Keep track of your own meetups, notifications and profile.",
+      },
     ],
     tags: ["Full-stack", "Real-time chat", "Personal project"],
     role: "Full-stack developer",
@@ -69,12 +89,22 @@ const projectDetails = [
     id: "esl",
     title: "Ethiopian Sign Language E-Learning",
     summary: "A React.js frontend for sign language courses and learner progress.",
+    intro: "Learn. Practice. Progress.",
     description:
-      "Contributed to the ETHSL learning platform as a frontend developer, building an interactive React.js experience and providing some backend support. The platform makes Ethiopian Sign Language education structured and accessible.",
-    features: [
-      "Built frontend experiences for browsing courses and learning levels.",
-      "Created interactive quiz and learner progress interfaces.",
-      "Connected and refined the user-facing learning experience with a focus on usability and accessibility.",
+      "I contributed to ETHSL as a frontend developer, building React.js experiences for courses, quizzes and learner progress, with some backend support. The platform gives Ethiopian Sign Language learners a structured way to follow lessons and practice.",
+    featureCards: [
+      {
+        title: "Courses & levels",
+        description: "Browse courses and learning levels in a structured learning experience.",
+      },
+      {
+        title: "Interactive quizzes",
+        description: "Practice with quiz interfaces built for the learning platform.",
+      },
+      {
+        title: "Progress & usability",
+        description: "Follow learner progress through a refined, accessibility-minded interface.",
+      },
     ],
     tags: ["React.js", "JavaScript", "Frontend", "Backend support"],
     role: "Frontend developer with backend support",
@@ -83,11 +113,18 @@ const projectDetails = [
     id: "movie",
     title: "Movie Explorer",
     summary: "A responsive way to explore films, ratings, genres and trailers.",
+    intro: "A better way to browse films.",
     description:
-      "Full-stack developer. The React.js frontend uses a Node.js backend to securely handle TMDB API requests.",
-    features: [
-      "Browse movie details including ratings, genres and trailers.",
-      "Responsive interface for browsing across devices.",
+      "Movie Explorer brings film details, ratings, genres and trailers into a responsive browsing experience. Its React.js frontend works with a Node.js backend that securely handles requests to the TMDB API.",
+    featureCards: [
+      {
+        title: "Explore film details",
+        description: "Browse movie ratings, genres and trailers in one place.",
+      },
+      {
+        title: "Responsive by design",
+        description: "Use the browsing experience across screen sizes.",
+      },
     ],
     tags: ["React.js", "Node.js", "TMDB API"],
     role: "Full-stack developer",
@@ -177,13 +214,11 @@ const skills = [
   ["Networking", "Cisco CCNA routing, switching and backbone networking"],
 ];
 
-function getSavedTheme() {
-  try {
-    const saved = localStorage.getItem("lud-portfolio-theme");
-    return saved === "dark" ? "dark" : "light";
-  } catch {
-    return "light";
-  }
+const themePhases = ["deep-dark", "soft-dark", "warm-dark", "soft-light", "warm-light", "pure-light"];
+const themeLabels = ["Deep Dark", "Soft Dark", "Warm Dark", "Soft Light", "Warm Light", "Pure Light"];
+
+function phaseForValue(value) {
+  return Math.min(themePhases.length - 1, Math.floor((value * themePhases.length) / 101));
 }
 
 function Timeline({ items }) {
@@ -208,92 +243,156 @@ function Timeline({ items }) {
   );
 }
 
-function ProjectGallery({ project, onOpen }) {
+function ProjectGallery({ project, onOpen, isActive }) {
   const images = projects[project.id];
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [motionStartIndex, setMotionStartIndex] = useState(0);
+  const [motionKey, setMotionKey] = useState(0);
   const selected = images[selectedIndex];
+  const updateIndex = useCallback((index) => setSelectedIndex(index), []);
+  const selectIndex = useCallback((index) => {
+    setSelectedIndex(index);
+    setMotionStartIndex(index);
+    setMotionKey((key) => key + 1);
+  }, []);
+  const step = (direction) => {
+    selectIndex((selectedIndex + direction + images.length) % images.length);
+  };
 
   return (
     <div className="gallery" aria-label={`${project.title} screenshots`}>
-      <button
-        className="gallery-open"
-        type="button"
-        aria-label={`Open ${selected.screen} screenshot in a larger view`}
-        onClick={() => onOpen(project.id, selectedIndex)}
-      >
-        <img
-          className="gallery-main"
-          src={selected.src}
-          alt={selected.alt}
-          loading="lazy"
-        />
-      </button>
-      <div className="gallery-thumbs" aria-label="Choose a screenshot">
-        {images.map((image, index) => (
+      <CircularCarousel
+        items={images}
+        activeIndex={selectedIndex}
+        motionStartIndex={motionStartIndex}
+        motionKey={motionKey}
+        onChange={updateIndex}
+        onSelect={selectIndex}
+        onOpen={(index) => onOpen(project.id, index)}
+        cardWidth={380}
+        interval={6}
+        direction="left"
+        pauseOnHover={false}
+        focusOnClick
+        draggable
+        tilt={0}
+        perspective={1800}
+        depthFade={0.55}
+        cornerRadius={12}
+        isActive={isActive}
+      />
+      <div className="gallery-navigation">
+        <div className="gallery-stepper" role="group" aria-label="Screenshot navigation">
           <button
-            className="thumb-button"
+            className="gallery-control"
             type="button"
-            key={image.screen}
-            aria-label={`Show ${image.screen} screenshot`}
-            aria-current={index === selectedIndex ? "true" : "false"}
-            onClick={() => setSelectedIndex(index)}
+            aria-label="Previous screenshot"
+            onClick={() => step(-1)}
           >
-            <img className="thumb-image" src={image.src} alt="" loading="lazy" />
+            ‹
           </button>
-        ))}
+          <button
+            className="gallery-control"
+            type="button"
+            aria-label="Next screenshot"
+            onClick={() => step(1)}
+          >
+            ›
+          </button>
+        </div>
+        <span className="gallery-count" aria-live="polite">
+          {selectedIndex + 1} / {images.length}
+        </span>
+        <div className="gallery-pagination" role="group" aria-label="Choose a screenshot">
+          {images.map((image, index) => (
+            <button
+              className="gallery-dot"
+              type="button"
+              key={image.screen}
+              aria-label={`Show ${image.screen} screenshot`}
+              aria-current={index === selectedIndex ? "true" : "false"}
+              onClick={() => selectIndex(index)}
+            />
+          ))}
+        </div>
       </div>
-      <p className="gallery-caption">Click the image to view full size.</p>
+      <p className="gallery-caption">Use the arrows to browse, or click the image to view full size.</p>
     </div>
   );
 }
 
-function ProjectRow({ project, isOpen, onToggle, onOpenLightbox }) {
-  const triggerId = `trigger-${project.id}`;
+function ProjectRow({ project, onOpenLightbox }) {
+  const headingId = `project-${project.id}-title`;
   const panelId = `panel-${project.id}`;
-  const isEven = ["pic", "movie"].includes(project.id);
+  const projectRef = useRef(null);
+  const hasEnteredView = useRef(false);
+  const [isInView, setIsInView] = useState(false);
+  const [hasPassed, setHasPassed] = useState(false);
+
+  useEffect(() => {
+    const projectElement = projectRef.current;
+    if (!projectElement) return undefined;
+    if (!("IntersectionObserver" in window)) {
+      setIsInView(true);
+      return undefined;
+    }
+
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        hasEnteredView.current = true;
+        setIsInView(true);
+        setHasPassed(false);
+      } else if (hasEnteredView.current && entry.boundingClientRect.top < 0) {
+        setIsInView(false);
+        setHasPassed(true);
+      }
+    }, { threshold: 0 });
+
+    observer.observe(projectElement);
+    return () => observer.disconnect();
+  }, []);
 
   return (
-    <article className="project">
-      <h3 className="project-heading">
-        <button
-          className="project-trigger"
-          id={triggerId}
-          type="button"
-          aria-expanded={isOpen}
-          aria-controls={panelId}
-          onClick={onToggle}
-        >
-          <span>
-            <span className="project-title">{project.title}</span>
-            <span className="project-summary">{project.summary}</span>
-          </span>
-          <span className="project-indicator" aria-hidden="true">+</span>
-        </button>
-      </h3>
+    <article className={`project${hasPassed ? " is-passed" : ""}`} ref={projectRef}>
+      <div className="project-heading">
+        <h3 className="project-title" id={headingId}>{project.title}</h3>
+        <span className="project-heading-meta">
+          <span className="project-summary">{project.summary}</span>
+          <ul className="tag-list project-header-tags" aria-label="Technologies">
+            {project.tags.map((tag) => <li key={tag}>{tag}</li>)}
+          </ul>
+        </span>
+      </div>
       <div
-        className={`project-panel${isOpen ? " is-open" : ""}`}
+        className={`project-panel${isInView ? " is-visible" : ""}`}
         id={panelId}
         role="region"
-        aria-labelledby={triggerId}
-        aria-hidden={!isOpen}
-        inert={!isOpen}
+        aria-labelledby={headingId}
+        aria-hidden={!isInView}
+        inert={!isInView}
       >
         <div className="panel-inner">
           <div className="project-content">
-            <div className={`project-body${isEven ? " reverse" : ""}`}>
-              <ProjectGallery project={project} onOpen={onOpenLightbox} />
-              <div>
-                <p style={{ font: "500 .72rem/1 var(--sans)", letterSpacing: ".1em", textTransform: "uppercase", color: "var(--coral)", marginBottom: ".75rem" }}>
-                  {project.role}
-                </p>
-                <p className="project-description">{project.description}</p>
-                <ul className="feature-list">
-                  {project.features.map((f) => <li key={f}>{f}</li>)}
-                </ul>
-                <ul className="tag-list" aria-label="Technologies">
-                  {project.tags.map((t) => <li key={t}>{t}</li>)}
-                </ul>
+            <div className="project-body project-body-featured">
+              <div className="project-details project-details-featured">
+                <p className="project-role">{project.role}</p>
+                <p className="project-description project-description-lead">{project.intro}</p>
+                <p className="project-description project-description-featured">{project.description}</p>
+                <div className="project-feature-cards">
+                  {project.featureCards.map((feature, index) => (
+                    <article className="project-feature-card" key={feature.title}>
+                      <span className="project-feature-number" aria-hidden="true">
+                        {String(index + 1).padStart(2, "0")}
+                      </span>
+                      <div>
+                        <h4>{feature.title}</h4>
+                        <p>{feature.description}</p>
+                      </div>
+                    </article>
+                  ))}
+                </div>
               </div>
+              <ProjectGallery project={project} onOpen={onOpenLightbox} isActive={isInView} />
             </div>
           </div>
         </div>
@@ -344,12 +443,27 @@ function Lightbox({ gallery, imageIndex, onClose, onStep }) {
 }
 
 export default function App() {
-  const [theme, setTheme] = useState(getSavedTheme);
-  const [openProject, setOpenProject] = useState("stricker");
+  const [themePhase, setThemePhase] = useState(0);
   const [lightbox, setLightbox] = useState(null);
   const [progress, setProgress] = useState(0);
   const [fontsReady, setFontsReady] = useState(false);
   const lastFocused = useRef(null);
+
+  const handleHeroCollageMove = useCallback((event) => {
+    if (event.pointerType === "touch") return;
+    const bounds = event.currentTarget.getBoundingClientRect();
+    const x = (event.clientX - bounds.left) / bounds.width - 0.5;
+    const y = (event.clientY - bounds.top) / bounds.height - 0.5;
+    event.currentTarget.style.setProperty("--collage-near-x", `${x * -5}px`);
+    event.currentTarget.style.setProperty("--collage-near-y", `${y * -5}px`);
+    event.currentTarget.style.setProperty("--collage-far-x", `${x * 3}px`);
+    event.currentTarget.style.setProperty("--collage-far-y", `${y * 3}px`);
+  }, []);
+
+  const resetHeroCollage = useCallback((event) => {
+    ["--collage-near-x", "--collage-near-y", "--collage-far-x", "--collage-far-y"]
+      .forEach((property) => event.currentTarget.style.removeProperty(property));
+  }, []);
 
   useEffect(() => {
     if (!document.fonts) {
@@ -359,12 +473,16 @@ export default function App() {
     document.fonts.ready.then(() => setFontsReady(true));
   }, []);
 
-  useEffect(() => {
-    document.documentElement.dataset.theme = theme;
-    document.querySelector('meta[name="theme-color"]').content =
-      theme === "dark" ? "#0e1520" : "#faf7f2";
-    try { localStorage.setItem("lud-portfolio-theme", theme); } catch {}
-  }, [theme]);
+  const handleThemeChange = useCallback((value) => {
+    const nextPhase = phaseForValue(value);
+    setThemePhase((current) => current === nextPhase ? current : nextPhase);
+  }, []);
+
+  useLayoutEffect(() => {
+    document.documentElement.dataset.themePhase = themePhases[themePhase];
+    const themeColors = ["#090d14", "#171c24", "#28211e", "#dce8f4", "#f4eadb", "#faf7f2"];
+    document.querySelector('meta[name="theme-color"]').content = themeColors[themePhase];
+  }, [themePhase]);
 
   useEffect(() => {
     const update = () => {
@@ -421,14 +539,27 @@ export default function App() {
             <a href="#research">Research &amp; media</a>
             <a href="#background">Background</a>
             <a href="#contact">Contact</a>
-            <button
-              className="theme-toggle"
-              type="button"
-              aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}
-              onClick={() => setTheme((c) => c === "dark" ? "light" : "dark")}
-            >
-              {theme === "dark" ? "☀ Light" : "☾ Dark"}
-            </button>
+            <WakeSlider
+              min={0}
+              max={100}
+              step={1}
+              bars={20}
+              height={26}
+              restHeight={6}
+              gap={2}
+              fillColor="#f5f5f5"
+              trackColor="#27272a"
+              sensitivity={1}
+              reach={6}
+              skew={0.6}
+              glide={0.3}
+              smoothing={100}
+              showValue={false}
+              value={0}
+              phase={themeLabels[themePhase]}
+              onChange={handleThemeChange}
+              disabled={false}
+            />
           </nav>
         </div>
       </header>
@@ -436,27 +567,86 @@ export default function App() {
       <main>
         {/* ── Hero ── */}
         <section className={`hero${fontsReady ? " fonts-ready" : ""}`} id="home" aria-labelledby="hero-title">
-          <div className="hero-bg-shape hero-bg-shape-1" aria-hidden="true" />
-          <div className="hero-bg-shape hero-bg-shape-2" aria-hidden="true" />
-          <p className="hero-eyebrow">
-            Full-stack software engineer · Addis Ababa, Ethiopia
-          </p>
-          <h1 id="hero-title">
-            <span className="name-word">Lud</span>{" "}
-            <span className="name-word">Amare</span>
-            <span className="hero-rule" aria-hidden="true" />
-          </h1>
-          <p className="hero-intro">
-            I build web applications and APIs with React, TypeScript, Laravel and Django —
-            turning requirements into products people can actually use.
-          </p>
-          <div className="hero-meta">
-            <span>Addis Ababa, Ethiopia</span>
-            <span>BSc Computer Science · AAU</span>
+          <div className="hero-background" aria-hidden="true">
+            <DotField
+              gradientFrom={themePhase < 3 ? "#79583D" : "#A98362"}
+              gradientTo={themePhase < 3 ? "#C49A70" : "#D8B995"}
+              dotRadius={1.5}
+              dotSpacing={14}
+              cursorRadius={240}
+              bulgeStrength={0.6}
+              glowRadius={160}
+              pattern="grid"
+              glowColor={themePhase < 3 ? "#D5B48D" : "#F0D9B9"}
+              gradientAngle={135}
+              twist={0}
+              glowIntensity={0.8}
+              baseOpacity={0.42}
+              waveAmplitude={0}
+              speed={1}
+              sparkle={false}
+              interactive
+              holdToZoom
+              intro
+              lightMode={themePhase >= 3}
+            />
+            <div className="hero-background-overlay" />
           </div>
-          <div className="hero-actions">
-            <a className="btn btn-primary" href="#work">Explore my work ↗</a>
-            <a className="btn btn-outline" href="#contact">Let's connect</a>
+          <div className="hero-content">
+            <div className="hero-composition">
+              <div className="hero-main">
+                <p className="hero-eyebrow">
+                  Full-stack software engineer <span aria-hidden="true">·</span> Addis Ababa, Ethiopia
+                </p>
+                <h1 id="hero-title" className="hero-headline">
+                  <span>Hello, I’m</span>
+                  <span className="hero-name">Lud <em>Amare.</em></span>
+                </h1>
+                <p className="hero-intro">
+                  I build web applications and APIs with React, TypeScript, Laravel, and Django — turning requirements into products people can actually use.
+                </p>
+                <ul className="hero-tech" aria-label="Technology stack">
+                  <li>React</li>
+                  <li>TypeScript</li>
+                  <li>Laravel</li>
+                  <li>Django</li>
+                </ul>
+                <div className="hero-meta">
+                  <span>Addis Ababa, Ethiopia</span>
+                  <span>BSc Computer Science · AAU</span>
+                </div>
+                <div className="hero-actions">
+                  <a className="btn btn-primary" href="#work">Explore My Work <span aria-hidden="true">↗</span></a>
+                  <a className="btn btn-outline" href="#contact">Let's Connect</a>
+                </div>
+              </div>
+              <aside
+                className="hero-collage"
+                aria-label="A selection of project work"
+                style={{ "--collage-accent": themePhase < 3 ? "#B89470" : "var(--hero-accent)" }}
+                onPointerMove={handleHeroCollageMove}
+                onPointerLeave={resetHeroCollage}
+              >
+                <div className="hero-collage-heading">
+                  <span>Selected work</span>
+                </div>
+                <div className="hero-collage-stage">
+                  <figure className="hero-print hero-print-streaker">
+                    <img src={streaker1} alt="Streaker habit tracker dashboard" />
+                    <figcaption><span>01 / Streaker</span><span>React · Laravel</span></figcaption>
+                  </figure>
+                  <figure className="hero-print hero-print-pic">
+                    <img src={pic1} alt="Partner In Crime event discovery page" />
+                    <figcaption><span>02 / Partner In Crime</span><span>Meetup app</span></figcaption>
+                  </figure>
+                  <figure className="hero-print hero-print-ethsl">
+                    <img src={ethsl1} alt="Ethiopian Sign Language learning platform" />
+                    <figcaption><span>03 / ETHSL</span><span>Learning platform</span></figcaption>
+                  </figure>
+                  <span className="hero-collage-annotation" aria-hidden="true">notes from the workbench</span>
+                </div>
+              </aside>
+            </div>
           </div>
         </section>
 
@@ -472,8 +662,6 @@ export default function App() {
               <ProjectRow
                 key={project.id}
                 project={project}
-                isOpen={openProject === project.id}
-                onToggle={() => setOpenProject((c) => c === project.id ? null : project.id)}
                 onOpenLightbox={openLightbox}
               />
             ))}
@@ -544,6 +732,30 @@ export default function App() {
 
         {/* ── Contact ── */}
         <section className="contact" id="contact" aria-labelledby="contact-title">
+          <div className="contact-background" aria-hidden="true">
+            <DotField
+              gradientFrom={themePhase < 3 ? "#6848D8" : "#A98362"}
+              gradientTo={themePhase < 3 ? "#B77BE4" : "#D8B995"}
+              dotRadius={1.5}
+              dotSpacing={14}
+              cursorRadius={240}
+              bulgeStrength={0.6}
+              glowRadius={160}
+              pattern="grid"
+              glowColor={themePhase < 3 ? "#A98BFF" : "#F0D9B9"}
+              gradientAngle={135}
+              twist={0}
+              glowIntensity={0.8}
+              baseOpacity={0.3}
+              waveAmplitude={0}
+              speed={1}
+              sparkle={false}
+              interactive
+              holdToZoom
+              intro
+              lightMode={themePhase >= 3}
+            />
+          </div>
           <div className="contact-inner">
             <p className="eyebrow" style={{ color: "rgba(240,236,228,.45)" }}>Get in touch</p>
             <h2 id="contact-title">
