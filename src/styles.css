@@ -331,6 +331,21 @@ h1, h2, h3, h4, p, li, a, strong, footer,
   gap: var(--wake-gap);
   width: 100%;
   height: 100%;
+  padding-left: 18px;
+}
+.wake-slider-sun {
+  position: absolute;
+  left: 7px;
+  top: 50%;
+  width: 13px;
+  height: 13px;
+  color: var(--wake-fill);
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-width: 1.8;
+  transform: translateY(-50%);
+  pointer-events: none;
 }
 .wake-slider-bar {
   flex: 1 1 0;
@@ -935,12 +950,12 @@ h3 {
   display: block;
   width: min(var(--card-width), 78vw, calc(100% - 1rem));
   aspect-ratio: 1;
-  padding: .5rem;
+  padding: 0;
   overflow: hidden;
-  border: 1px solid color-mix(in srgb, var(--line) 75%, transparent);
-  border-radius: var(--card-radius);
-  background: var(--surface);
-  box-shadow: var(--shadow-lg);
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
   cursor: pointer;
   opacity: var(--card-depth-opacity, .3);
   will-change: opacity, filter;
@@ -949,25 +964,29 @@ h3 {
     translate(-50%, -50%)
     rotateY(var(--carousel-card-angle))
     translateZ(var(--carousel-radius))
-    rotateX(var(--carousel-tilt));
-  transition: background-color 600ms ease, border-color 600ms ease, box-shadow 600ms ease;
+    rotateX(var(--carousel-tilt))
+    scale(var(--card-scale, 1));
   -webkit-tap-highlight-color: transparent;
 }
 .carousel-card img {
   display: block;
   width: 100%;
   height: 100%;
-  border-radius: calc(var(--card-radius) - 5px);
-  background: var(--parchment);
+  border-radius: 0;
+  background: transparent;
   object-fit: contain;
   pointer-events: none;
 }
+[data-theme-phase="soft-light"] .carousel-card img,
+[data-theme-phase="warm-light"] .carousel-card img,
+[data-theme-phase="pure-light"] .carousel-card img,
+[data-theme-phase="soft-light"] .lightbox-image,
+[data-theme-phase="warm-light"] .lightbox-image,
+[data-theme-phase="pure-light"] .lightbox-image {
+  filter: drop-shadow(0 0 1.25px rgba(17,24,39,.9));
+}
 .carousel-card.is-active {
   cursor: zoom-in;
-  box-shadow: 0 16px 48px rgba(var(--shadow-rgb),.2);
-}
-.carousel-card.is-active:hover {
-  box-shadow: 0 20px 56px rgba(var(--shadow-rgb),.28);
 }
 .carousel-card:focus-visible {
   outline: 2px solid var(--focus);
@@ -1241,9 +1260,9 @@ footer {
   display: block; width: auto; max-width: 100%;
   height: auto; max-height: 78vh;
   object-fit: contain;
-  background: #0a0f1a;
-  border: 1px solid rgba(255,255,255,.1);
-  border-radius: 8px;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
   margin-inline: auto;
 }
 .lightbox-caption {

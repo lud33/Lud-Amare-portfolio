@@ -15,6 +15,8 @@ export default function CircularCarousel({
   onChange,
   onSelect,
   onOpen,
+  onPhotoClick,
+  isPaused = false,
   cardWidth = 220,
   interval = 3,
   direction = "left",
@@ -96,7 +98,7 @@ export default function CircularCarousel({
     if (!draggable || event.button !== 0) return;
     dragStart.current = { x: event.clientX, pointerId: event.pointerId };
     didDrag.current = false;
-    event.currentTarget.setPointerCapture(event.pointerId);
+    event.target.setPointerCapture(event.pointerId);
   };
 
   const handlePointerUp = (event) => {
@@ -139,7 +141,7 @@ export default function CircularCarousel({
           "--carousel-start-angle": `${-motionStartIndex * rotation}deg`,
           "--carousel-end-angle": `${-motionStartIndex * rotation + (direction === "left" ? -360 : 360)}deg`,
           animation: prefersReducedMotion ? "none" : undefined,
-          animationPlayState: !isActive || (pauseOnHover && isHovered) ? "paused" : "running",
+          animationPlayState: !isActive || isPaused || (pauseOnHover && isHovered) ? "paused" : "running",
         }}
       >
         {items.map((item, index) => {
@@ -158,6 +160,7 @@ export default function CircularCarousel({
                   didDrag.current = false;
                   return;
                 }
+                onPhotoClick();
                 if (isActive) onOpen(index);
                 else if (focusOnClick) onSelect(index);
               }}
@@ -167,6 +170,7 @@ export default function CircularCarousel({
                 "--carousel-card-angle": `${index * rotation}deg`,
                 "--carousel-tilt": `${tilt}deg`,
                 "--card-radius": `${cornerRadius}px`,
+                "--card-scale": isPaused && isActive ? 1.06 : 1,
               }}
             >
               <img src={item.src} alt={item.alt} draggable="false" loading="lazy" />

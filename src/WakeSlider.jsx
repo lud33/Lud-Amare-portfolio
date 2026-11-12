@@ -42,6 +42,15 @@ export default function WakeSlider({
       }}
       onPointerLeave={() => setWakePosition(null)}
     >
+      <svg
+        className="wake-slider-sun"
+        viewBox="0 0 24 24"
+        aria-hidden="true"
+        style={{ opacity: 0.35 + progress * 0.65 }}
+      >
+        <circle cx="12" cy="12" r="4" />
+        <path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42" />
+      </svg>
       <div className="wake-slider-bars" aria-hidden="true">
         {Array.from({ length: bars }, (_, index) => {
           const distance = wakePosition === null ? 0 : Math.abs(index - wakePosition);

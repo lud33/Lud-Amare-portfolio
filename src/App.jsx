@@ -248,6 +248,7 @@ function ProjectGallery({ project, onOpen, isActive }) {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [motionStartIndex, setMotionStartIndex] = useState(0);
   const [motionKey, setMotionKey] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
   const selected = images[selectedIndex];
   const updateIndex = useCallback((index) => setSelectedIndex(index), []);
   const selectIndex = useCallback((index) => {
@@ -269,6 +270,8 @@ function ProjectGallery({ project, onOpen, isActive }) {
         onChange={updateIndex}
         onSelect={selectIndex}
         onOpen={(index) => onOpen(project.id, index)}
+        onPhotoClick={() => setIsPaused(true)}
+        isPaused={isPaused}
         cardWidth={380}
         interval={6}
         direction="left"
@@ -316,7 +319,7 @@ function ProjectGallery({ project, onOpen, isActive }) {
           ))}
         </div>
       </div>
-      <p className="gallery-caption">Use the arrows to browse, or click the image to view full size.</p>
+      <p className="gallery-caption">Click a photo to pause the rotation; click the selected photo to view full size.</p>
     </div>
   );
 }
@@ -544,8 +547,8 @@ export default function App() {
               max={100}
               step={1}
               bars={20}
-              height={26}
-              restHeight={6}
+              height={20}
+              restHeight={4}
               gap={2}
               fillColor="#f5f5f5"
               trackColor="#27272a"
